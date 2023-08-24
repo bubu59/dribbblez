@@ -7,6 +7,7 @@ import FormField from "./FormField"
 import { categoryFilters } from "@/constants"
 import CustomMenu from "./CustomMenu"
 import Button from "../shared/Button"
+import { createNewProject } from "@/lib/actions"
 
 type Props = {
     type: string,
@@ -16,8 +17,19 @@ type Props = {
 const ProjectForm = ({ type, session }: Props) => {
 
     const handleFormSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
 
-    }
+        setIsSubmitting(true)
+
+        try {
+            if(type === 'create') {
+                //create project
+                await createNewProject(form, session?.user?.id, token)
+            }
+        } catch (error) {
+
+        }
+    }   
 
     const handleChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault()
@@ -117,9 +129,13 @@ const ProjectForm = ({ type, session }: Props) => {
 
         <div className="flexStart w-full">
             <Button
-                title="Create"
+                title={
+                    isSubmitting 
+                     ? `${type === 'create' ? 'Creating' : 'Editing'}`
+                     : `${type === 'create' ? 'Create' : 'Edit'}`
+                }
                 type="submit"
-                leftIcon = '/plus.svg'
+                leftIcon = {isSubmitting ? "" : '/plus.svg'}
                 isSubmitting={isSubmitting}
             />
         </div>
