@@ -45,7 +45,7 @@ const ProjectForm = ({ type, session }: Props) => {
         ))
     }
 
-    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [form, setForm] = useState({
         image: '',
         title: '',
@@ -119,7 +119,7 @@ const ProjectForm = ({ type, session }: Props) => {
             <Button
                 title="Create"
                 type="submit"
-                leftIcon = {isSubmitting ? "" : '/plus.svg'}
+                leftIcon = '/plus.svg'
                 isSubmitting={isSubmitting}
             />
         </div>

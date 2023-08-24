@@ -25,13 +25,13 @@ const Button = ({
   return (
     <button
         type={type || 'button'}
-        disabled={isSubmitting}
+        // disabled={isSubmitting || false}
         className="flexCenter gap-3 px-4 py-3"
         onClick={handleClick}
     >
         {leftIcon && 
             <Image
-                src={leftIcon}
+                src='/plus.svg'
                 width={14}
                 height={14}
                 alt="left"
