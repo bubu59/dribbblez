@@ -6,7 +6,6 @@ import jsonwebtoken from 'jsonwebtoken'
 import { JWT } from 'next-auth/jwt'
 import { SessionInterface, UserProfile } from "@/common.types";
 import { createUser, getUser } from "./actions";
-import { onNewTesterIosDevicePublished } from "firebase-functions/v2/alerts/appDistribution";
 
 export const authOptions: NextAuthOptions = {
     secret: process.env.NEXT_AUTH_SECRET,
@@ -16,14 +15,24 @@ export const authOptions: NextAuthOptions = {
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!
         })
     ],
-    // jwt: {
-    //     encode: ({ secret, token }) => {
+    jwt: {
+        encode: ({ secret, token }) => {
+            const encodedToken = 
+            jsonwebtoken.sign({
+                ...token,
+                iss: 'grafbase',
+                exp: Math.floor(Date.now() / 1000 + 60 * 60)
+            }, secret)
 
-    //     },
-    //     decode: async ({ secret, token }) => {
+            return encodedToken
+        },
+        decode: async ({ secret, token }) => {
+            const decodedToken = 
+            jsonwebtoken.verify(token!, secret) as JWT
 
-    //     }
-    // },
+            return decodedToken
+        }
+    },
     theme: {
         colorScheme: 'light',
         logo: './logo.png'
@@ -33,7 +42,7 @@ export const authOptions: NextAuthOptions = {
             const email = session?.user?.email as string
             try {
                 const data = await getUser(email) as { user?: UserProfile}
-
+                console.log(data)
                 const newSession = {
                     ...session,
                     user: {
@@ -53,7 +62,7 @@ export const authOptions: NextAuthOptions = {
                 //get the user if they exist 
                 const userExists = await getUser(user?.email as string) as { user?: UserProfile }
                 //if they dont exist, create them 
-                if(!userExists)  {
+                if(!userExists.user)  {
                     await createUser(
                         user.name as string, 
                         user.email as string, 
@@ -62,7 +71,7 @@ export const authOptions: NextAuthOptions = {
                 }
                 return true
             } catch (error: any) {
-                console.log(error)
+                console.log("Error checking if user exists: ", error.message)
                 return false
             }
         }
