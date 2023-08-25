@@ -42,6 +42,15 @@ export const createUser = (name: string, email: string, avatarUrl: string ) => {
     return makeGraphQLRequest(createUserMutation, variables)
 }   
 
+export const fetchToken = async () => {
+    try {
+        const response = await fetch(`${serverUrl}/api/auth/token`)
+        return response.json()
+    } catch (error) {
+        throw error
+    }
+}
+
 export const uploadImage = async(imagePath: string) => {
     try {
         const response = await fetch(`${serverUrl}/api/upload`, {
@@ -59,13 +68,15 @@ export const createNewProject = async(form: ProjectForm, creatorId:string, token
     const ImageUrl = await uploadImage(form.image)
 
     if(ImageUrl.url) {
-        client.setHeader("Authorization", `Bearer: ${token}`)
+        client.setHeader("Authorization", `Bearer ${token}`)
         const variables = {
-            ...form,
-            image: ImageUrl.url,
-            createdBy: {
-                link: creatorId
-            }
+            input: { 
+                ...form, 
+                image: ImageUrl.url, 
+                createdBy: { 
+                  link: creatorId 
+                }
+              }
         }
         return makeGraphQLRequest(createProjectMutation, variables)
     }
