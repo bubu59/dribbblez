@@ -1,4 +1,5 @@
 import { ProjectForm } from '@/common.types'
+import { categoryFilters } from '@/constants'
 import { createProjectMutation, createUserMutation, getUserQuery, projectsQuery } from '@/graphql'
 import { GraphQLClient } from 'graphql-request'
 
@@ -84,6 +85,11 @@ export const createNewProject = async(form: ProjectForm, creatorId:string, token
 
 export const fetchAllProjects = (category?: string | null, endcursor?: string | null) => {
     client.setHeader("x-api-key", apiKey);
-  
-    return makeGraphQLRequest(projectsQuery, { category, endcursor });
+
+    const categories = category == null ? categoryFilters : [category];
+
+    return makeGraphQLRequest(projectsQuery, { categories, endcursor });
 };
+
+
+
