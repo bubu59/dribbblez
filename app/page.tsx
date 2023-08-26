@@ -1,10 +1,11 @@
 import { ProjectInterface } from '@/common.types'
 import ProjectCard from '@/components/card/ProjectCard';
+import Categories from '@/components/shared/Categories';
+import LoadMore from '@/components/shared/LoadMore';
 import { fetchAllProjects } from '@/lib/actions'
 
 type SearchParams = {
   category?: string | null;
-  endcursor?: string | null;
 }
 
 type Props = {
@@ -23,25 +24,27 @@ type ProjectSearch = {
   }
 }
 
-const Home = async () => {
+const Home = async ({searchParams : { category}}: Props) => {
 
-  const data = await fetchAllProjects() as ProjectSearch
+  const data = await fetchAllProjects(category) as ProjectSearch
 
   const projectsToDisplay = data?.projectSearch?.edges || []
 
   if(projectsToDisplay.length === 0 ) {
     return (
       <section className='flexStart flex-col paddings'>
-        Categories 
+        <Categories/>
 
         <p className='no-result-text text-center'>No projects found, go create some first.</p>
       </section>
     )
   }
 
+  const pagination = data?.projectSearch?.pageInfo
+
   return (
     <section className='flex-start flex-col paddings mb-16'>
-        <h1>Categories</h1>
+        <Categories/>
 
         <section className='projects-grid'>
           {projectsToDisplay.map(({ node } : { node: ProjectInterface}) => (
@@ -57,7 +60,12 @@ const Home = async () => {
           ))}
         </section>
 
-        <h1>Load MOre</h1>
+        <LoadMore
+          startCursor={pagination.startCursor}
+          endCursor={pagination.endCursor}
+          hasPreviousPage={pagination.hasPreviousPage}
+          hasNextPage={pagination.hasPreviousPage}
+        />
     </section>
   )
 }
